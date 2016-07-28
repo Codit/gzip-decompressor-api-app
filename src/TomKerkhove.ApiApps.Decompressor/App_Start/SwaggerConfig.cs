@@ -229,7 +229,7 @@ namespace TomKerkhove.ApiApps.Decompressor
 
         private static string GetXmlCommentsPath()
         {
-            return $"{System.AppDomain.CurrentDomain.BaseDirectory}\\XmlComments.xml";
+            return $"{System.AppDomain.CurrentDomain.BaseDirectory}\\bin\\XmlComments.xml";
         }
     }
 }
