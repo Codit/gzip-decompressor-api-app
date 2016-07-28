@@ -229,7 +229,7 @@ namespace TomKerkhove.ApiApps.Decompressor
 
         private static string GetXmlCommentsPath()
         {
-            return HostingEnvironment.MapPath("~/App_Data/Swagger.XML");
+            return $"{System.AppDomain.CurrentDomain.BaseDirectory}\\XmlComments.xml";
         }
     }
 }
