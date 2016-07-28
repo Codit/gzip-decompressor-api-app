@@ -5,6 +5,8 @@ GZip Decompressor Azure API App
 
 Azure API App to download, decompress &amp; store a file on Azure Blob Storage.
 
+> This API App stores the file directly on Azure Blob Storage because of the file size limitations in Azure Logic Apps. For more information, see the Logic App Limitations [here](https://azure.microsoft.com/en-us/documentation/articles/app-service-logic-limits-and-config/).
+
 ## Deploying the API App
 To deploy the custom API App you can select one of the following options:
 
