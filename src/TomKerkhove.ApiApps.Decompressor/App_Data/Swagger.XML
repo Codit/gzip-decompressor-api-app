@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TomKerkhove.ApiApps.Decompressor</name>
+    </assembly>
+    <members>
+        <member name="T:TomKerkhove.ApiApps.Decompressor.Controllers.DecompressionController">
+            <summary>
+            Decompression
+            </summary>
+        </member>
+        <member name="M:TomKerkhove.ApiApps.Decompressor.Controllers.DecompressionController.Get(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Downloads, decompresses and stores a file to Azure Blob Storage
+            </summary>
+            <param name="uri">Uri of the compressed file to download</param>
+            <param name="storageAccountName">Name Azure Storage Account</param>
+            <param name="storageAccountKey">Key for Azure Storage Account</param>
+            <param name="containerName">Name of the container</param>
+            <param name="blobName">Name of the blob</param>
+        </member>
+    </members>
+</doc>
