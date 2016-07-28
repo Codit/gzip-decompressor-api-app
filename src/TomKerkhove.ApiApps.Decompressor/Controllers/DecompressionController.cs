@@ -16,11 +16,15 @@ namespace TomKerkhove.ApiApps.Decompressor.Controllers
         /// <summary>
         /// Downloads, decompresses and stores a file to Azure Blob Storage
         /// </summary>
+        /// <remarks>
+        /// Downloads, decompresses and stores a file to Azure Blob Storage
+        /// </remarks>
         /// <param name="uri">Uri of the compressed file to download</param>
         /// <param name="storageAccountName">Name Azure Storage Account</param>
         /// <param name="storageAccountKey">Key for Azure Storage Account</param>
         /// <param name="containerName">Name of the container</param>
         /// <param name="blobName">Name of the blob</param>
+        /// <response code="200">The file was successfully processed</response>
         [HttpGet]
         public async Task<IHttpActionResult> Get(string uri, string storageAccountName, string storageAccountKey,
             string containerName, string blobName)
