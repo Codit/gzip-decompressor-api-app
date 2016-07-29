@@ -1,13 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using System.Net.Http;
 using System.Web.Http;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Swashbuckle.Swagger.Annotations;
-using TomKerkhove.ApiApps.Decompressor.Exceptions;
+using TomKerkhove.ApiApps.Decompressor.Azure;
+using TomKerkhove.ApiApps.Decompressor.Compression;
 
 namespace TomKerkhove.ApiApps.Decompressor.Controllers
 {
@@ -48,12 +45,15 @@ namespace TomKerkhove.ApiApps.Decompressor.Controllers
                     return NotFound();
                 }
 
-                // Decompress the stream
-                var uncompressedStream = await DecompressStreamAsync(compressedStream);
+                using (var decompressedStream = new MemoryStream())
+                {
+                    // Decompress the stream
+                    await Gzip.DecompressToAsync(compressedStream, decompressedStream);
 
-                await
-                    StoreOnBlobStorageAsync(storageAccountName, storageAccountKey, containerName, blobName,
-                        uncompressedStream);
+                    // Upload to blob storage
+                    await BlobStorage.UploadAsync(storageAccountName, storageAccountKey, containerName, blobName,
+                            decompressedStream);
+                }
 
                 return Ok();
             }
@@ -132,53 +132,6 @@ namespace TomKerkhove.ApiApps.Decompressor.Controllers
             var response = await httpClient.GetAsync(uri);
 
             return (response.IsSuccessStatusCode) ? await response.Content.ReadAsStreamAsync() : Stream.Null;
-        }
-
-        private static async Task<Stream> DecompressStreamAsync(Stream compressedStream)
-        {
-            try
-            {
-                // Seek to origin, if possible
-                if (compressedStream.CanSeek && compressedStream.Position > 0)
-                {
-                    compressedStream.Seek(0, SeekOrigin.Begin);
-                }
-
-                var unzippedStream = new MemoryStream();
-                using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
-                {
-                    await gzipStream.CopyToAsync(unzippedStream);
-
-                    // Seek back to the origin of the unzipped stream
-                    unzippedStream.Seek(0, SeekOrigin.Begin);
-                }
-
-                return unzippedStream;
-            }
-            catch (Exception ex)
-            {
-                // Wrap in a custom exception to clearly state that it's the decompression that failed
-                throw new DecompressionException("Failed to decompress the stream", ex);
-            }
-        }
-
-        private async Task StoreOnBlobStorageAsync(string storageAccountName, string storageAccountKey, string containerName, string blobName, Stream decompressedStream)
-        {
-            // Create client
-            StorageCredentials storageCreds = new StorageCredentials(storageAccountName, storageAccountKey);
-            CloudStorageAccount account = new CloudStorageAccount(storageCreds, useHttps: true);
-            var blobClient = account.CreateCloudBlobClient();
-
-            // Get a reference to the container
-            var container = blobClient.GetContainerReference(containerName.ToLower());
-            await container.CreateIfNotExistsAsync();
-
-            // Get a reference to the blob
-            var blob = container.GetBlockBlobReference(blobName);
-            await blob.UploadFromStreamAsync(decompressedStream);
-
-            // Cleanup
-            decompressedStream.Dispose();
         }
     }
 }
